@@ -120,14 +120,18 @@ The `submission.csv` file will be generated in the current directory.
 
 The gap between this solution (0.7769) and the top of the leaderboard (~0.803) is roughly 2.5 points. The most likely strategies to close it, in order of expected impact for this specific dataset:
 
-**1. Richer feature engineering**
+**1. Tuning XGBoost and CatBoost with Optuna**
+
+In this solution, Optuna only tunes LightGBM. XGBoost and CatBoost use manually chosen fixed parameters. Given that CatBoost carries the highest weight (0.80) in the final ensemble, not tuning it is likely the most significant gap in the current pipeline. Extending the Optuna objective to all three models would be the most impactful single change.
+
+**2. Richer feature engineering**
 
 The most important feature by a large margin was `last_contact_duration`. Stronger solutions likely built more sophisticated features around it, such as:
 - Duration relative to the mean duration for the same `job` group
 - Interactions between duration and `prev_camp_outcome`
 - Aggregate statistics per group (e.g. mean purchase rate per `job` + `education` combination)
 
-**2. Stacking**
+**3. Stacking**
 
 Instead of a simple weighted average of the three models, a meta-model (e.g. logistic regression) is trained on the OOF predictions:
 
@@ -139,25 +143,21 @@ CAT OOF ──┘
 
 This captures non-linear relationships between model outputs that a weighted average cannot express.
 
-**3. More Optuna trials**
+**4. More Optuna trials**
 
-The tuning here ran for 50 trials. With 200–300 trials, hyperparameters improve meaningfully — especially for CatBoost, which carried the highest weight (0.80) in the final ensemble.
+The tuning here ran for 50 trials. With 200–300 trials, hyperparameters improve meaningfully across all three models.
 
-**4. Wider ensemble diversity**
+**5. Pseudo-labeling**
+
+High-confidence test predictions (e.g. $p < 0.05$ or $p > 0.95$) can be added back to the training set as additional labeled examples. This is a common technique in top Kaggle solutions, particularly effective on smaller datasets like this one where the test set represents roughly 20% of all available data.
+
+**6. Wider ensemble diversity**
 
 Adding models such as `ExtraTreesClassifier` or sklearn's `HistGradientBoostingClassifier` increases ensemble diversity and tends to add useful signal beyond the three GBDT implementations used here.
 
-**5. Tabular neural network**
+**7. Tabular neural network**
 
 Some top Kagglers include a TabNet or a simple MLP in the ensemble. Tree-based and neural models make sufficiently different errors that combining them reduces variance further.
-
-**6. Tuning XGBoost and CatBoost with Optuna**
-
-In this solution, Optuna only tunes LightGBM. XGBoost and CatBoost use manually chosen fixed parameters. Given that CatBoost carries the highest weight (0.80) in the final ensemble, not tuning it is likely the most significant gap in the current pipeline. Extending the Optuna objective to all three models would be the most impactful single change.
-
-**7. Pseudo-labeling**
-
-High-confidence test predictions (e.g. $p < 0.05$ or $p > 0.95$) can be added back to the training set as additional labeled examples. This is a common technique in top Kaggle solutions, particularly effective on smaller datasets like this one where the test set represents roughly 20% of all available data.
 
 **8. More seeds**
 
