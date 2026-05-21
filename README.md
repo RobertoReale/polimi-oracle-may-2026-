@@ -151,6 +151,18 @@ Adding models such as `ExtraTreesClassifier` or sklearn's `HistGradientBoostingC
 
 Some top Kagglers include a TabNet or a simple MLP in the ensemble. Tree-based and neural models make sufficiently different errors that combining them reduces variance further.
 
+**6. Tuning XGBoost and CatBoost with Optuna**
+
+In this solution, Optuna only tunes LightGBM. XGBoost and CatBoost use manually chosen fixed parameters. Given that CatBoost carries the highest weight (0.80) in the final ensemble, not tuning it is likely the most significant gap in the current pipeline. Extending the Optuna objective to all three models would be the most impactful single change.
+
+**7. Pseudo-labeling**
+
+High-confidence test predictions (e.g. $p < 0.05$ or $p > 0.95$) can be added back to the training set as additional labeled examples. This is a common technique in top Kaggle solutions, particularly effective on smaller datasets like this one where the test set represents roughly 20% of all available data.
+
+**8. More seeds**
+
+Increasing from 3 to 5–7 seeds costs very little in terms of code complexity and further reduces prediction variance. Returns diminish quickly beyond 5 seeds, but the improvement over 3 is still measurable.
+
 ---
 
 ## Documentation
