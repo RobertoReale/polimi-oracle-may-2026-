@@ -1,5 +1,7 @@
 # Polimi@Oracle 2026 — Kaggle Competition
 
+Top ~10% Kaggle solution for binary classification of bank customer purchases — LightGBM + XGBoost + CatBoost ensemble with Optuna tuning, achieving F1 Macro **0.7769** on the private leaderboard.
+
 > **Organizer:** Lorenzo Barcella (Polimi Data Scientists x Oracle)
 > **Type:** Binary Classification — Community Prediction Competition
 > **Metric:** F1 Macro
